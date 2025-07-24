@@ -58,7 +58,7 @@ def filter_tasks(status_filter):
 # Completa una tarea
 def complete_task(index):
     tasks = load_tasks()
-    if 0 <= index < len(tasks):
+    if 0 < index <= len(tasks):
         if tasks[index]["completed"] == True:
             print(msg_warning + "\nLa tarea ya está completada.")
         else:
@@ -78,6 +78,35 @@ def delete_task(index):
     else:
         print(msg_warning + "\nÍndice inválido.")
 
+# Edita una tarea
+def edit_task(index):
+    tasks = load_tasks()
+    if 0 <= index < len(tasks):
+        status = Fore.GREEN + "Realizada" if tasks[index]["completed"] else Fore.RED + "Pendiente"
+        print(Fore.CYAN + f"{index + 1}. {status}{Fore.WHITE} - {tasks[index]['description']}")
+        print("\n1. Editar estado.")
+        print("\n2. Editar descripción.")
+       
+        choice = int(input("\n Introduce tu elección: "))       
+        if choice == 1:
+            print("\n" + Fore.GREEN + "1-Realizado" + Fore.WHITE + " | " + Fore.RED + "2-Pendiente")
+            estado = int(input("\nNuevo estado (1/2): "))
+            if estado == 1:
+                tasks[index]["completed"] = True
+                print("\n" + msg_info + "Estado actualizado.")
+            elif estado == 2:
+                tasks[index]["completed"] = False
+                print("\n" + msg_info + "Estado actualizado.")
+            else:
+                print(msg_warning + "\nOpción no válida.")
+        elif choice == 2:
+            description = input("\nNueva descripción: ")
+            tasks[index]["description"] = description
+            print("\n" + msg_info + "Descripción actualizada.")
+        else:
+            print(msg_warning + "\nOpción no válida.")
+        save_tasks(tasks)
+
 # Limpia la pantalla
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
@@ -88,13 +117,14 @@ def pause():
 
 # Muestra el menú principal
 def show_menu():
-    print(Fore.CYAN + "\nGestor de tareas")
+    print(Style.BRIGHT + Fore.CYAN + "\nGestor de tareas")
     print("\n" + Fore.BLUE + "1." + Fore.WHITE + " Añadir tarea")
     print("\n" + Fore.BLUE + "2." + Fore.WHITE + " Listar todas las tareas")
     print("\n" + Fore.BLUE + "3." + Fore.WHITE + " Completar tarea")
     print("\n" + Fore.BLUE + "4." + Fore.WHITE + " Eliminar tarea")
     print("\n" + Fore.BLUE + "5." + Fore.WHITE + " Filtrar tareas")
-    print("\n" + Fore.BLUE + "6." + Fore.WHITE + " Salir\n")
+    print("\n" + Fore.BLUE + "6." + Fore.WHITE + " Editar tarea")
+    print("\n" + Fore.BLUE + "7." + Fore.WHITE + " Salir\n")
 
 # Programa principal
 while True:
@@ -113,15 +143,15 @@ while True:
         pause()
         
     elif choice == "3":
-        if filter_tasks("todas"):
-            idx = int(input("\nNúmero de la tarea a completar: ")) - 1
-            complete_task(idx)
+        if filter_tasks("todas") == True:
+            idx = int(input("\nNúmero de la tarea a completar: "))
+            complete_task(idx - 1)
         pause()
         
     elif choice == "4":
-        if filter_tasks("todas") != False:
-            idx = int(input("\nNúmero de la tarea a eliminar: ")) - 1
-            delete_task(idx)
+        if filter_tasks("todas") == True:
+            idx = int(input("\nNúmero de la tarea a eliminar: "))
+            delete_task(idx - 1)
         pause()
         
     elif choice == "5":
@@ -143,7 +173,13 @@ while True:
         pause()
        
     elif choice == "6":
-        print(Fore.CYAN + "Gracias por usar nuestra aplicación.")
+        if filter_tasks("todas") == True:
+            idx = int(input("\nNúmero de la tarea a editar: "))
+            edit_task(idx - 1)
+        pause()
+
+    elif choice == "7":
+        print(Style.BRIGHT + Fore.CYAN + "Gracias por usar nuestra aplicación.")
         break
 
     else:
