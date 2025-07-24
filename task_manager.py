@@ -1,9 +1,10 @@
 import json
 import os
 
-#Archivo dónde guardaremos las tareas
+# Archivo dónde guardaremos las tareas
 TASKS_FILE = "tasks.json"
 
+# Carga de los datos del archivo
 def load_tasks():
     if os.path.exists(TASKS_FILE):
         with open(TASKS_FILE, "r") as f:
@@ -13,19 +14,19 @@ def load_tasks():
                 return []
     return []
 
+# Guardado de los datos en el archivo
 def save_tasks(tasks):
     with open(TASKS_FILE, "w") as f:
         json.dump(tasks, f, indent=4)
-        
+
+# Se añade una nueva tarea
 def add_task(description):
     tasks = load_tasks()
     tasks.append({"description": description, "completed": False})
     save_tasks(tasks)
-    print("Tarea añadida.")
-    
-def list_tasks():
-    filter_tasks("todas")
-    
+    print("\nTarea añadida.")
+
+# Hace una búsqueda con filtro
 def filter_tasks(status_filter):
     tasks = load_tasks()
     filtered = []
@@ -43,63 +44,88 @@ def filter_tasks(status_filter):
         print("No hay tareas para mostar.")
         return
     
-    print(f"\nTareas {status_filter}:")
+    print(f"Tareas ({status_filter}):\n")
     for idx, task in enumerate(filtered):
         status = "Realizada" if task["completed"] else "Pendiente"
         print(f"{idx + 1}. {status} - {task['description']}")
 
+# Completa una tarea
 def complete_task(index):
     tasks = load_tasks()
     if 0 <= index < len(tasks):
-        tasks[index]["completed"] = True
+        if tasks[index]["completed"] == True:
+            print("\nLa tarea ya está completada.")
+        else:
+            tasks[index]["completed"] = True
+            print("\nTarea completada.")
         save_tasks(tasks)
-        print("Tarea completada.")
-    else:
-        print("Índice inválido.")
         
+    else:
+        print("\nÍndice inválido.")
+
+# Elimina una tarea
 def delete_task(index):
     tasks = load_tasks()
     if 0 <= index < len(tasks):
         removed = tasks.pop(index)
         save_tasks(tasks)
-        print(f"Tarea eliminada: {removed['description']}")
+        print(f"\nTarea eliminada: {removed['description']}")
     else:
-        print("Índice inválido.")
+        print("\nÍndice inválido.")
 
+# Limpia la pantalla
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+# Crea una pausa hasta presionar 'Enter'
+def pause():
+    input("\nPulse ENTER para volver al menú...")
+
+# Muestra el menú principal
 def show_menu():
-    print("\nGestor de tareas")
+    print("Gestor de tareas")
     print("\n1. Añadir tarea")
     print("\n2. Listar todas las tareas")
     print("\n3. Completar tarea")
     print("\n4. Eliminar tarea")
     print("\n5. Filtrar tareas")
-    print("\n6. Salir")
-    
+    print("\n6. Salir\n")
+
+# Programa principal
 while True:
+    clear_screen()
     show_menu()
     choice = input("Elige una opción: ")
+    clear_screen()
     
     if choice == "1":
         desc = input("Descripción de la tarea: ")
         add_task(desc)
+        pause()
         
     elif choice == "2":
-        list_tasks()
+        filter_tasks("todas")
+        pause()
         
     elif choice == "3":
-        idx = int(input("Número de la tarea a completar: ")) - 1
+        filter_tasks("todas")
+        idx = int(input("\nNúmero de la tarea a completar: ")) - 1
         complete_task(idx)
+        pause()
         
     elif choice == "4":
-        idx = int(input("Número de la tarea a eliminar: ")) - 1
+        filter_tasks("todas")
+        idx = int(input("\nNúmero de la tarea a eliminar: ")) - 1
         delete_task(idx)
+        pause()
         
     elif choice == "5":
-        print("\nFiltrar por:")        
+        print("Filtrar por:\n")        
         print("1. Pendientes")        
         print("2. Completadas")        
         print("3. Todas")
-        filter = input("Elige una opción: ")
+        filter = input("\nElige una opción: ")
+        clear_screen()
         
         if filter == "1":
             filter_tasks("pendientes")
@@ -108,7 +134,8 @@ while True:
         elif filter == "3":
             filter_tasks("todas")
         else:
-            print("Opción inválida.") 
+            print("Opción inválida.")
+        pause()
        
     elif choice == "6":
         print("Saliendo...")
@@ -116,3 +143,4 @@ while True:
 
     else:
         print("Opción no válida.")
+        pause()
